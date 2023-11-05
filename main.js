@@ -1,11 +1,71 @@
 const rock = "Rock";
 const paper = "Paper"; 
 const scissors = "Scissors";
-const player1 = "Player1";
+const player1 = "You";
 const player2 = "Computer";
 
 
-game(); 
+let playerScore = 0;
+let computerScore = 0;
+
+
+
+const gameButtons = document.querySelectorAll(".btn");
+const outputDiv = document.querySelector(".output");
+
+gameButtons.forEach(btn => btn.addEventListener('click', function(e){
+
+    let playerChoice = e.target.innerText;
+    let computerChoice = getComputerChoice();
+
+    writeToOutput("You choosed: " + playerChoice);
+    writeToOutput("Computer choosed: " + computerChoice, true);
+
+    let roundWinner = playRound(playerChoice, computerChoice);
+    console.log("roundWinner: " +roundWinner)
+    
+    writeToOutput("Try again :) ", true);
+    
+    
+
+}));
+
+outputDiv.addEventListener("click", e => clearOutput());
+
+
+
+/*
+    writes the messsage to the outputbox if append true, text will be appended at the end
+
+    @param {String} pMessage - messsage which should be shown
+    @param {Boolean} append - check if the message should be attended at the bottom
+
+    @return {Void}
+*/
+function writeToOutput(message, doAppend = false)
+{
+
+    const outputDiv = document.querySelector(".output");
+
+    if(doAppend)
+    {
+        message = outputDiv.innerText + "\n" + message;
+    }
+
+    outputDiv.innerText = message;
+}
+
+/*
+    clears the outputdiv 
+
+    @return {Void}
+*/
+function clearOutput()
+{
+    writeToOutput(null);
+}
+
+
 
 function getComputerChoice()
 {
@@ -19,7 +79,7 @@ function getRandomInt(min, max)
 {
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
-  
+
 /*
     plays the game and returns the winner
 
@@ -28,9 +88,9 @@ function getRandomInt(min, max)
 
     @return {String} winner of the game
 */
-function playGame(pPlayersChoice, pComputerChoice)
+function playRound(pPlayersChoice, pComputerChoice) 
 {
-    let winner;
+    let winner; 
 
     switch(pPlayersChoice.toUpperCase())
     {
@@ -81,23 +141,78 @@ function playGame(pPlayersChoice, pComputerChoice)
             return;
     }
 
-    let winningCondition;
+    let winningText;
     if(winner === "Draw")
     {
-        winningCondition = pPlayersChoice + " is even to " + pComputerChoice;
+        winningText = "Draw";
     }
     else if(winner == player1)
     {
-        winningCondition = pPlayersChoice + " beats " + pComputerChoice;
+        winningText = "You've won!"
     }
     else
     {
-        winningCondition = pComputerChoice + " beats " + pPlayersChoice;
+        winningText = "Computer won!";
     }
     
-    console.log("Winner is: " + winner + " - " + winningCondition); 
+    increaseScore(winner);
+    writeToOutput(winningText + "\n ----------\n ", true)
+
     return winner;
 }
+
+
+/*
+    increases the game score of the winner and updates the score at the ui <br>
+    when draw no score has to be updated
+    
+
+    @param {String} winner
+
+    @return {Void}
+*/
+function increaseScore(winner)
+{
+    if(winner == player1)
+    {
+        playerScore++;
+        setUiScore(winner, playerScore);
+        return;
+    }
+
+    //computer won
+    if(winner == player2)
+    {
+        computerScore++;
+        setUiScore(winner, playerScore); 
+        return; 
+    }
+}
+
+/*
+    writes the new Score to the ui
+
+    @param {String} winner 
+    @param {Number} score - the score which should be set 
+
+    @return {Void}
+ */
+function setUiScore(winner, score)
+{
+    const scoreDiv = document.querySelector(".score"); 
+    let regex = new RegExp(winner + ": \\d+");
+
+    scoreDiv.innerText = scoreDiv.innerText.replace(regex, winner + ": " + score);
+}
+
+
+
+//--------------------------------------------------------
+
+
+
+  
+
 
 
 function game()
