@@ -3,12 +3,10 @@ const paper = "Paper";
 const scissors = "Scissors";
 const player1 = "You";
 const player2 = "Computer";
-
+const WINSCORE = 5;
 
 let playerScore = 0;
 let computerScore = 0;
-
-
 
 const gameButtons = document.querySelectorAll(".btn");
 const outputDiv = document.querySelector(".output");
@@ -22,12 +20,10 @@ gameButtons.forEach(btn => btn.addEventListener('click', function(e){
     writeToOutput("Computer choosed: " + computerChoice, true);
 
     let roundWinner = playRound(playerChoice, computerChoice);
-    console.log("roundWinner: " +roundWinner)
     
     writeToOutput("Try again :) ", true);
+    checkWinner(); 
     
-    
-
 }));
 
 outputDiv.addEventListener("click", e => clearOutput());
@@ -199,41 +195,49 @@ function increaseScore(winner)
  */
 function setUiScore(winner, score)
 {
-    const scoreDiv = document.querySelector(".score"); 
+    let scoreDiv = document.querySelector(".score"); 
     let regex = new RegExp(winner + ": \\d+");
 
     scoreDiv.innerText = scoreDiv.innerText.replace(regex, winner + ": " + score);
 }
 
-
-
-//--------------------------------------------------------
-
-
-
-  
-
-
-
-function game()
+function checkWinner()
 {
-    let scorePlayer1 = 0;
-    let scorePlayer2 = 0;
-
-    for(let i = 0; i <= 5; i++)
+    if(playerScore >= WINSCORE)
     {
-        let userInput = prompt("Let's play Rock Paper Scissors! Pick one")
-        let gameResult = playGame(userInput, getComputerChoice());
-
-        if(gameResult == player1)
-        {
-            scorePlayer1++;
-        }
-        if(gameResult == player2)
-        {
-            scorePlayer2++;
-        }
+        setWinnerUi(player1);
     }
+    else if(computerScore >= WINSCORE)
+    {
+        setWinnerUi(player2);
+    }
+}
 
-    console.log("Winner is: " + ( (scorePlayer1 > scorePlayer2) ? player1 + " with a Score of: " + scorePlayer1 + ":" +scorePlayer2  : player2 + " with a Score of: " + scorePlayer2 + ":" + scorePlayer1));
+/*
+    displays the winner of the game and replaces the game button with a reset button
+
+    @param {String} winner - the winner of the game
+
+    @return {void}
+*/
+function setWinnerUi(winner)
+{
+    writeToOutput(winner + (winner == player1 ? " have " : " has" )+ " won!");
+    writeToOutput("Want to play again?", true); 
+
+    let inputDiv = document.querySelector(".input");
+    let gameButtons = document.querySelectorAll(".btn");
+
+    gameButtons.forEach(btn => btn.remove());
+
+    let resetButton = document.createElement("button"); 
+    resetButton.classList.add("btn");
+    resetButton.textContent = "Reset";
+
+    inputDiv.appendChild(resetButton);
+
+   resetButton.addEventListener("click", e => {
+       location.reload(); 
+       return false
+    });
 }
